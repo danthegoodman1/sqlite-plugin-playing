@@ -5,6 +5,7 @@
 .log stderr
 
 .open main.db
+PRAGMA journal_mode; -- we should be in memory mode by default
 
 .databases
 .vfsinfo
