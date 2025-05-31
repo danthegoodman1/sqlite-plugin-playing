@@ -217,7 +217,7 @@ impl Vfs for MemVfs {
         DEFAULT_DEVICE_CHARACTERISTICS | vars::SQLITE_IOCAP_BATCH_ATOMIC
     }
 
-    fn file_control(&self, handle: &mut Self::Handle, op: c_int, p_arg: *mut c_void) -> VfsResult<()> {
+    fn file_control(&self, handle: &mut Self::Handle, op: c_int, _p_arg: *mut c_void) -> VfsResult<()> {
         log::debug!("file_control: file={:?}, op={:?}", handle.name, op);
         match op {
             vars::SQLITE_FCNTL_COMMIT_ATOMIC_WRITE => {
