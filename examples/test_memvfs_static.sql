@@ -1,11 +1,9 @@
--- Load the memvfs extension and open a new connection using it
--- Build the memvfs extension using the following command:
---   cargo build --example memvfs --features dynamic
+-- Test script for static memvfs that's built into SQLite binary
+-- The memvfs should already be registered as the default VFS
 
 -- uncomment to enable verbose logs
 .log stderr
 
-.load target/debug/examples/libmemvfs.so
 .open main.db
 
 .databases
@@ -23,4 +21,4 @@ vacuum;
 drop table t1;
 vacuum;
 
-select * from dbstat;
+select * from dbstat; 

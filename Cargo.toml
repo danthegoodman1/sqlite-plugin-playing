@@ -25,12 +25,20 @@ parking_lot = "=0.12.3"
 [build-dependencies]
 bindgen = { version = "0.71", default-features = false }
 
+[dependencies]
+rusqlite = { version = "=0.36.0", features = ["bundled"], optional = true }
+
 [features]
 default = ["static"]
-static = []
+static = ["rusqlite"]
 dynamic = []
 
 [[example]]
 name = "memvfs"
 crate-type = ["cdylib"]
 required-features = ["dynamic"]
+
+[[example]]
+name = "memvfs_static"
+crate-type = ["staticlib"]
+required-features = ["static"]
