@@ -1,13 +1,14 @@
 // cargo build --example memvfs_static --features static
 
 use std::{ffi::CStr, sync::Arc};
+use core::ffi::{c_int, c_void};
 
 use parking_lot::Mutex;
 use sqlite_plugin::{
     flags::{AccessFlags, LockLevel, OpenOpts},
     logger::{SqliteLogLevel, SqliteLogger},
     vars,
-    vfs::{Pragma, PragmaErr, RegisterOpts, Vfs, VfsHandle, VfsResult, register_static},
+    vfs::{register_static, Pragma, PragmaErr, RegisterOpts, Vfs, VfsHandle, VfsResult, DEFAULT_DEVICE_CHARACTERISTICS},
 };
 
 #[derive(Debug, Clone)]
@@ -209,6 +210,30 @@ impl Vfs for MemVfs {
     ) -> Result<Option<String>, PragmaErr> {
         log::debug!("pragma: file={:?}, pragma={:?}", handle.name, pragma);
         Err(PragmaErr::NotFound)
+    }
+
+    fn device_characteristics(&self) -> i32 {
+        log::debug!("device_characteristics given with batch atomic");
+        DEFAULT_DEVICE_CHARACTERISTICS | vars::SQLITE_IOCAP_BATCH_ATOMIC
+    }
+
+    fn file_control(&self, handle: &mut Self::Handle, op: c_int, p_arg: *mut c_void) -> VfsResult<()> {
+        log::debug!("file_control: file={:?}, op={:?}", handle.name, op);
+        match op {
+            vars::SQLITE_FCNTL_COMMIT_ATOMIC_WRITE => {
+                log::debug!("commit_atomic_write control given");
+                Ok(())
+            }
+            vars::SQLITE_FCNTL_ROLLBACK_ATOMIC_WRITE => {
+                log::debug!("rollback_atomic_write control given");
+                Ok(())
+            }
+            vars::SQLITE_FCNTL_BEGIN_ATOMIC_WRITE => {
+                log::debug!("begin_atomic_write control given");
+                Ok(())
+            }
+            _ => Err(vars::SQLITE_NOTFOUND),
+        }
     }
 }
 

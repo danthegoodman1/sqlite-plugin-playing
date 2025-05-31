@@ -207,6 +207,15 @@ pub trait Vfs: Send + Sync {
     fn device_characteristics(&self) -> i32 {
         DEFAULT_DEVICE_CHARACTERISTICS
     }
+
+    fn file_control(
+        &self,
+        handle: &mut Self::Handle,
+        op: c_int,
+        p_arg: *mut c_void,
+    ) -> VfsResult<()> {
+        Err(vars::SQLITE_NOTFOUND)
+    }
 }
 
 #[derive(Clone)]
@@ -595,7 +604,13 @@ unsafe extern "C" fn x_file_control<T: Vfs>(
             result
         });
     }
-    vars::SQLITE_NOTFOUND
+
+    fallible(|| {
+        let file = unwrap_file!(p_file, T)?;
+        let vfs = unwrap_vfs!(file.vfs, T)?;
+        vfs.file_control(unsafe { file.handle.assume_init_mut() }, op, p_arg)?;
+        Ok(vars::SQLITE_OK)
+    })
 }
 
 // system queries
