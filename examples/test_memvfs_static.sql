@@ -22,4 +22,4 @@ vacuum;
 drop table t1;
 vacuum;
 
-select * from dbstat; 
+select * from dbstat;
