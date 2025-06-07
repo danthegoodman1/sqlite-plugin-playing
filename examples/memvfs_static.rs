@@ -67,6 +67,7 @@ impl Vfs for MemVfs {
 
         let log = LogCompat { logger: Mutex::new(logger) };
         log::set_boxed_logger(Box::new(log)).expect("failed to setup global logger");
+        log::debug!("registered logger");
     }
 
     fn open(&self, path: Option<&str>, opts: OpenOpts) -> VfsResult<Self::Handle> {
